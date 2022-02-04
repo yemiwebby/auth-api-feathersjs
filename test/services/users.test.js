@@ -1,45 +1,45 @@
-const axios = require("axios");
-const assert = require("assert");
-const url = require("url");
-const app = require("../../src/app");
+const axios = require('axios');
+const assert = require('assert');
+const url = require('url');
+const app = require('../../src/app');
 
-const port = app.get("port") || 8998;
+const port = app.get('port') || 8998;
 const getUrl = (pathname) =>
   url.format({
-    hostname: app.get("host") || "localhost",
-    protocol: "http",
+    hostname: app.get('host') || 'localhost',
+    protocol: 'http',
     port,
     pathname,
   });
 
-describe("'users' service", () => {
-  it("registered the service", () => {
-    const service = app.service("users");
-    assert.ok(service, "Registered the service");
+describe('\'users\' service', () => {
+  it('registered the service', () => {
+    const service = app.service('users');
+    assert.ok(service, 'Registered the service');
   });
 });
 
-describe("Additional security checks on user endpoints", () => {
+describe('Additional security checks on user endpoints', () => {
   let alice = {
-    email: "alice@feathersjs.com",
-    password: "supersecret12",
+    email: 'alice@feathersjs.com',
+    password: 'supersecret12',
   };
 
   let bob = {
-    email: "bob@feathersjs.com",
-    password: "supersecret1",
+    email: 'bob@feathersjs.com',
+    password: 'supersecret1',
   };
 
   const getTokenForUser = async (user) => {
-    const { accessToken } = await app.service("authentication").create({
-      strategy: "local",
+    const { accessToken } = await app.service('authentication').create({
+      strategy: 'local',
       ...user,
     });
     return accessToken;
   };
 
   const setupUser = async (user) => {
-    const { _id } = await app.service("users").create(user);
+    const { _id } = await app.service('users').create(user);
     user._id = _id;
     user.accessToken = await getTokenForUser(user);
   };
@@ -57,7 +57,7 @@ describe("Additional security checks on user endpoints", () => {
     server.close();
   });
 
-  it("should return 403 when user tries to delete another user", async () => {
+  it('should return 403 when user tries to delete another user', async () => {
     const { accessToken } = alice;
     const { _id: targetId } = bob;
     const config = { headers: { Authorization: `Bearer ${accessToken}` } };
@@ -70,12 +70,12 @@ describe("Additional security checks on user endpoints", () => {
       assert.equal(response.status, 403);
       assert.equal(
         response.data.message,
-        "You are not authorized to perform this operation on another user"
+        'You are not authorized to perform this operation on another user'
       );
     }
   });
 
-  it("should return 403 when user tries to put another user", async () => {
+  it('should return 403 when user tries to put another user', async () => {
     try {
       const { accessToken } = bob;
       const { _id: targetId } = alice;
@@ -89,12 +89,12 @@ describe("Additional security checks on user endpoints", () => {
       assert.equal(response.status, 403);
       assert.equal(
         response.data.message,
-        "You are not authorized to perform this operation on another user"
+        'You are not authorized to perform this operation on another user'
       );
     }
   });
 
-  it("should return 403 when user tries to patch another user", async () => {
+  it('should return 403 when user tries to patch another user', async () => {
     try {
       const { accessToken } = alice;
       const { _id: targetId } = bob;
@@ -108,7 +108,7 @@ describe("Additional security checks on user endpoints", () => {
       assert.equal(response.status, 403);
       assert.equal(
         response.data.message,
-        "You are not authorized to perform this operation on another user"
+        'You are not authorized to perform this operation on another user'
       );
     }
   });
